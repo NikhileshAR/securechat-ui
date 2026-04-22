@@ -3,135 +3,529 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SecureChat v1.0</title>
-
+<title>SecureChat</title>
 <style>
-/* (your entire CSS unchanged — kept exactly as you gave it) */
-@import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;700;800&display=swap');
 
-*{box-sizing:border-box;margin:0;padding:0}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-:root{
-  --bg:#000800;
-  --green:#00ff41;
-  --green-dim:#00aa2a;
-  --green-dark:#003a0e;
-  --green-glow:#00ff4133;
-  --amber:#ffb000;
-  --red:#ff2222;
-  --font:'Share Tech Mono', monospace;
-  --font-display:'VT323', monospace;
-}
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #18181f;
+    --border: #ffffff12;
+    --border2: #ffffff20;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --accent: #7cfc8e;
+    --accent2: #5ce870;
+    --danger: #ff5a5a;
+    --self: #1a2e1c;
+    --other: #1a1a28;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-display: 'Syne', sans-serif;
+  }
 
-body{
-  background:var(--bg);
-  color:var(--green);
-  font-family:var(--font);
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-}
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-mono);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
 
-/* minimal (kept shorter for clarity but same look) */
-#boot-screen{position:fixed;inset:0;padding:20px;font-size:13px}
-.boot-line{opacity:0;animation:fade 0.05s forwards}
-@keyframes fade{to{opacity:1}}
+  /* SETUP SCREEN */
+  #setup-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    padding: 24px;
+    gap: 0;
+  }
 
-#setup-screen,#chat-screen{display:none;height:100vh;flex-direction:column}
+  .logo {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
 
-textarea,input{
-  background:#000;
-  border:1px solid var(--green-dim);
-  color:var(--green);
-  padding:8px;
-}
+  .tagline {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    margin-bottom: 48px;
+  }
 
-.btn{
-  border:1px solid var(--green);
-  background:var(--green-dark);
-  color:var(--green);
-  padding:10px;
-  cursor:pointer;
-}
+  .setup-card {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 32px;
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
 
-.messages-area{flex:1;overflow:auto;padding:10px}
-.message-line{display:flex;gap:8px}
-.msg-time{color:var(--green-dim)}
-.msg-sender.self{color:var(--amber)}
-.system-line{color:var(--green-dim)}
+  .field-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
 
-.status-led{width:8px;height:8px;border-radius:50%;background:var(--red)}
-.status-led.online{background:var(--green)}
+  .field-group { display: flex; flex-direction: column; }
 
+  input, textarea {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: none;
+  }
+
+  input:focus, textarea:focus { border-color: var(--accent); }
+  input::placeholder, textarea::placeholder { color: var(--muted); }
+
+  .my-key-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 10px;
+    color: var(--accent);
+    word-break: break-all;
+    line-height: 1.6;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    position: relative;
+  }
+
+  .my-key-box:hover { border-color: var(--accent); }
+
+  .copy-hint {
+    font-size: 9px;
+    color: var(--muted);
+    margin-top: 6px;
+    letter-spacing: 0.1em;
+  }
+
+  .btn {
+    background: var(--accent);
+    color: #0a0a0f;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 14px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    text-transform: uppercase;
+  }
+
+  .btn:hover { background: var(--accent2); }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    font-size: 11px;
+    padding: 10px 14px;
+  }
+
+  .btn-ghost:hover { color: var(--text); border-color: var(--border2); background: transparent; }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+  }
+
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* CHAT SCREEN */
+  #chat-screen {
+    display: none;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  .chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+
+  .chat-header-left { display: flex; align-items: center; gap: 12px; }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    animation: pulse 2s infinite;
+  }
+
+  .status-dot.offline { background: var(--danger); box-shadow: 0 0 8px var(--danger); animation: none; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .chat-title {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .chat-subtitle {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  .header-actions { display: flex; gap: 8px; }
+
+  .icon-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 6px 10px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .icon-btn:hover { color: var(--text); border-color: var(--border2); }
+
+  .messages-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    scroll-behavior: smooth;
+  }
+
+  .messages-area::-webkit-scrollbar { width: 4px; }
+  .messages-area::-webkit-scrollbar-track { background: transparent; }
+  .messages-area::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  .message {
+    display: flex;
+    flex-direction: column;
+    max-width: 72%;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .message.self { align-self: flex-end; align-items: flex-end; }
+  .message.other { align-self: flex-start; align-items: flex-start; }
+
+  .message-bubble {
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+
+  .message.self .message-bubble {
+    background: var(--self);
+    border: 1px solid #2a4a2c;
+    border-bottom-right-radius: 3px;
+    color: #c8f0cc;
+  }
+
+  .message.other .message-bubble {
+    background: var(--other);
+    border: 1px solid var(--border2);
+    border-bottom-left-radius: 3px;
+  }
+
+  .message-meta {
+    font-size: 9px;
+    color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 0.08em;
+  }
+
+  .system-msg {
+    align-self: center;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    padding: 6px 12px;
+    background: var(--surface2);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+
+  .input-area {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    flex-shrink: 0;
+  }
+
+  #msg-input {
+    flex: 1;
+    max-height: 120px;
+    min-height: 44px;
+    padding: 12px 14px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+
+  .send-btn {
+    background: var(--accent);
+    border: none;
+    border-radius: 10px;
+    color: #0a0a0f;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 10px 16px;
+    transition: background 0.15s, transform 0.1s;
+    flex-shrink: 0;
+    height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  .send-btn:hover { background: var(--accent2); }
+  .send-btn:active { transform: scale(0.95); }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: #00000088;
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 24px;
+  }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 28px;
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .modal-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .key-display {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 9px;
+    color: var(--accent);
+    word-break: break-all;
+    line-height: 1.8;
+    cursor: pointer;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.08em;
+  }
+
+  .tag.encrypted { background: #0d2e10; color: var(--accent); border: 1px solid #1a4a1e; }
+  .tag.relay { background: #1a1a10; color: #d4c850; border: 1px solid #3a3a1a; }
+
+  .tags-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  #toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    color: var(--accent);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    padding: 10px 18px;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+    z-index: 200;
+    white-space: nowrap;
+  }
+
+  #toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: var(--muted);
+  }
+
+  .empty-icon { font-size: 32px; opacity: 0.3; }
+  .empty-text { font-size: 12px; letter-spacing: 0.1em; }
 </style>
 </head>
-
 <body>
 
-<div id="boot-screen"></div>
-
+<!-- SETUP SCREEN -->
 <div id="setup-screen">
-  <h3>SECURECHAT SETUP</h3>
+  <div class="logo">SecureChat</div>
+  <div class="tagline">end-to-end encrypted · relay-blind · self-hostable</div>
 
-  <div id="my-pubkey">generating...</div>
+  <div class="setup-card">
+    <div class="field-group">
+      <div class="field-label">Your Public Key (share this with the other person)</div>
+      <div class="my-key-box" id="my-pubkey" onclick="copyMyKey()">generating...</div>
+      <div class="copy-hint">↑ click to copy</div>
+    </div>
 
-  <input id="my-name" placeholder="name" />
+    <div class="field-group">
+      <div class="field-label">Your Name</div>
+      <input type="text" id="my-name" placeholder="alice" maxlength="32" />
+    </div>
 
-  <textarea id="peer-pubkey" placeholder="paste peer key"></textarea>
+    <div class="divider">connect to someone</div>
 
-  <input id="relay-url" value="wss://secure-chat-relay-production.up.railway.app"/>
+    <div class="field-group">
+      <div class="field-label">Their Public Key</div>
+      <textarea id="peer-pubkey" rows="4" placeholder="paste their public key here..."></textarea>
+    </div>
 
-  <button class="btn" onclick="startChat()">CONNECT</button>
+    <div class="field-group">
+      <div class="field-label">Relay URL</div>
+      <input type="text" id="relay-url" value="wss://secure-chat-relay-production.up.railway.app" />
+    </div>
+
+    <button class="btn" id="connect-btn" onclick="startChat()">Connect & Start Chatting</button>
+  </div>
 </div>
 
+<!-- CHAT SCREEN -->
 <div id="chat-screen">
-  <div>
-    <span id="status-led" class="status-led"></span>
-    <span id="status-text">OFFLINE</span>
+  <div class="chat-header">
+    <div class="chat-header-left">
+      <div class="status-dot" id="status-dot"></div>
+      <div>
+        <div class="chat-title" id="chat-title">Chat</div>
+        <div class="chat-subtitle" id="chat-subtitle">connecting...</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="tags-row">
+        <span class="tag encrypted">🔒 E2E encrypted</span>
+        <span class="tag relay">⚡ relay-blind</span>
+      </div>
+      <button class="icon-btn" onclick="showMyKey()" title="Show my key">🔑</button>
+      <button class="icon-btn" onclick="location.reload()" title="New chat">↩</button>
+    </div>
   </div>
 
-  <div id="messages" class="messages-area"></div>
+  <div class="messages-area" id="messages"></div>
 
-  <textarea id="msg-input" onkeydown="handleKey(event)"></textarea>
-  <button onclick="sendMessage()">SEND</button>
+  <div class="input-area">
+    <textarea id="msg-input" placeholder="type a message..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+    <button class="send-btn" onclick="sendMessage()">➤</button>
+  </div>
+</div>
+
+<!-- MY KEY MODAL -->
+<div class="modal-overlay" id="key-modal" style="display:none" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-title">Your Public Key</div>
+    <div class="key-display" id="modal-key" onclick="copyMyKey()"></div>
+    <div class="copy-hint">click to copy · share this with people who want to message you</div>
+    <button class="btn btn-ghost" onclick="document.getElementById('key-modal').style.display='none'">close</button>
+  </div>
 </div>
 
 <div id="toast"></div>
 
 <script>
-
-// ───────── BOOT ─────────
-
-const bootLines = [
-  { text: 'SECURECHAT TERMINAL v1.0.0', cls: '' },
-  { text: 'INITIALIZING CRYPTO...', cls: '' },
-  { text: 'GENERATING KEYS...', cls: '' },
-  { text: 'READY.', cls: '' },
-];
-
-async function runBoot() {
-  const el = document.getElementById('boot-screen');
-  for (let l of bootLines) {
-    await new Promise(r => setTimeout(r, 70));
-    const d = document.createElement('div');
-    d.className = 'boot-line';
-    d.textContent = l.text;
-    el.appendChild(d);
-  }
-  await new Promise(r => setTimeout(r, 300));
-  el.style.display = 'none';
-  document.getElementById('setup-screen').style.display = 'flex';
-}
-
-// ───────── CRYPTO ─────────
+// ─── CRYPTO HELPERS (Web Crypto API) ────────────────────────────────────────
 
 async function generateECDHKeyPair() {
-  return crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveBits']);
+  return await crypto.subtle.generateKey(
+    { name: 'ECDH', namedCurve: 'P-256' },
+    true,
+    ['deriveKey', 'deriveBits']
+  );
 }
 
 async function generateECDSAKeyPair() {
-  return crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify']);
+  return await crypto.subtle.generateKey(
+    { name: 'ECDSA', namedCurve: 'P-256' },
+    true,
+    ['sign', 'verify']
+  );
 }
 
 async function exportPublicKey(key) {
@@ -139,233 +533,317 @@ async function exportPublicKey(key) {
   return btoa(String.fromCharCode(...new Uint8Array(raw)));
 }
 
-async function importECDH(b64) {
+async function importPublicKeyECDH(b64) {
   const raw = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
-  return crypto.subtle.importKey('spki', raw, { name: 'ECDH', namedCurve: 'P-256' }, true, []);
+  return await crypto.subtle.importKey('spki', raw, { name: 'ECDH', namedCurve: 'P-256' }, true, []);
 }
 
-async function importECDSA(b64) {
-  const raw = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
-  return crypto.subtle.importKey('spki', raw, { name: 'ECDSA', namedCurve: 'P-256' }, true, ['verify']);
+async function deriveSharedSecret(privateKey, publicKey) {
+  const bits = await crypto.subtle.deriveBits(
+    { name: 'ECDH', public: publicKey },
+    privateKey,
+    256
+  );
+  return bits;
 }
 
-async function deriveSecret(priv, pub) {
-  return crypto.subtle.deriveBits({ name: 'ECDH', public: pub }, priv, 256);
+async function hkdf(secret, info, length = 32) {
+  const keyMaterial = await crypto.subtle.importKey('raw', secret, 'HKDF', false, ['deriveBits']);
+  const bits = await crypto.subtle.deriveBits(
+    { name: 'HKDF', hash: 'SHA-256', salt: new Uint8Array(32), info: new TextEncoder().encode(info) },
+    keyMaterial,
+    length * 8
+  );
+  return bits;
 }
 
-async function hkdf(secret, info) {
-  const km = await crypto.subtle.importKey('raw', secret, 'HKDF', false, ['deriveBits']);
-  return crypto.subtle.deriveBits({
-    name: 'HKDF',
-    hash: 'SHA-256',
-    salt: new Uint8Array(32),
-    info: new TextEncoder().encode(info)
-  }, km, 256);
-}
-
-async function encrypt(text, ss) {
-  const keyBits = await hkdf(ss, 'msg-key');
+async function encryptMessage(plaintext, sharedSecret) {
+  const keyBits = await hkdf(sharedSecret, 'securechat-msg-key');
   const key = await crypto.subtle.importKey('raw', keyBits, { name: 'AES-GCM' }, false, ['encrypt']);
-
   const iv = crypto.getRandomValues(new Uint8Array(12));
-  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(text));
-
+  const encoded = new TextEncoder().encode(plaintext);
+  const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoded);
   return {
     iv: btoa(String.fromCharCode(...iv)),
-    ct: btoa(String.fromCharCode(...new Uint8Array(ct)))
+    ct: btoa(String.fromCharCode(...new Uint8Array(ciphertext)))
   };
 }
 
-async function decrypt(payload, ss) {
+async function decryptMessage(payload, sharedSecret) {
   try {
-    const keyBits = await hkdf(ss, 'msg-key');
+    const keyBits = await hkdf(sharedSecret, 'securechat-msg-key');
     const key = await crypto.subtle.importKey('raw', keyBits, { name: 'AES-GCM' }, false, ['decrypt']);
-
     const iv = Uint8Array.from(atob(payload.iv), c => c.charCodeAt(0));
     const ct = Uint8Array.from(atob(payload.ct), c => c.charCodeAt(0));
-
-    return new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ct));
+    const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ct);
+    return new TextDecoder().decode(plain);
   } catch {
     return null;
   }
 }
 
-async function sign(privateKey, data) {
-  const sig = await crypto.subtle.sign(
-    { name: 'ECDSA', hash: 'SHA-256' },
-    privateKey,
-    new TextEncoder().encode(data)
-  );
+async function signData(privateKey, data) {
+  const encoded = new TextEncoder().encode(data);
+  const sig = await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, privateKey, encoded);
   return btoa(String.fromCharCode(...new Uint8Array(sig)));
 }
 
-async function verify(pubKey, data, sigB64) {
+async function verifyData(publicKeyB64, data, sigB64) {
   try {
+    const raw = Uint8Array.from(atob(publicKeyB64), c => c.charCodeAt(0));
+    const pubKey = await crypto.subtle.importKey('spki', raw, { name: 'ECDSA', namedCurve: 'P-256' }, true, ['verify']);
+    const encoded = new TextEncoder().encode(data);
     const sig = Uint8Array.from(atob(sigB64), c => c.charCodeAt(0));
-    return await crypto.subtle.verify(
-      { name: 'ECDSA', hash: 'SHA-256' },
-      pubKey,
-      sig,
-      new TextEncoder().encode(data)
-    );
+    return await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, pubKey, sig, encoded);
   } catch {
     return false;
   }
 }
 
-// ───────── STATE ─────────
+function randomId() {
+  return crypto.randomUUID();
+}
 
-let myIdentity, sharedSecret, ws;
+// ─── STATE ───────────────────────────────────────────────────────────────────
+
+let myIdentity = null; // { ecdhKeyPair, ecdsaKeyPair, ecdhPublicB64, ecdsaPublicB64, deviceId }
+let peerECDHPublicB64 = null;
+let sharedSecret = null;
+let ws = null;
+let myName = 'me';
 let connected = false;
-let myName = 'ME';
 
-// replay protection
-let lastSeenCounter = -1;
-
-// ───────── INIT ─────────
+// ─── INIT ────────────────────────────────────────────────────────────────────
 
 async function init() {
-  const ecdh = await generateECDHKeyPair();
-  const ecdsa = await generateECDSAKeyPair();
+  // Generate identity
+  const ecdhKeyPair = await generateECDHKeyPair();
+  const ecdsaKeyPair = await generateECDSAKeyPair();
+  const ecdhPublicB64 = await exportPublicKey(ecdhKeyPair.publicKey);
+  const ecdsaPublicB64 = await exportPublicKey(ecdsaKeyPair.publicKey);
 
-  const pubECDH = await exportPublicKey(ecdh.publicKey);
-  const pubECDSA = await exportPublicKey(ecdsa.publicKey);
+  myIdentity = {
+    ecdhKeyPair,
+    ecdsaKeyPair,
+    ecdhPublicB64,
+    ecdsaPublicB64,
+    deviceId: randomId()
+  };
 
-  const id = crypto.randomUUID();
+  // Display public key (ECDH for encryption + ECDSA for signing, combined)
+  const combined = JSON.stringify({ ecdh: ecdhPublicB64, ecdsa: ecdsaPublicB64, id: myIdentity.deviceId });
+  const combinedB64 = btoa(combined);
+  myIdentity.fullPublicKey = combinedB64;
 
-  const full = btoa(JSON.stringify({ ecdh: pubECDH, ecdsa: pubECDSA, id }));
-
-  myIdentity = { ecdh, ecdsa, deviceId: id, fullPublicKey: full };
-
-  document.getElementById('my-pubkey').textContent = full;
-  document.getElementById('modal-key').textContent = full;
+  document.getElementById('my-pubkey').textContent = combinedB64;
+  document.getElementById('modal-key').textContent = combinedB64;
 }
 
-// ───────── CHAT SETUP ─────────
+// ─── SETUP ───────────────────────────────────────────────────────────────────
 
 async function startChat() {
-  const peerRaw = document.getElementById('peer-pubkey').value.trim();
-  const relay = document.getElementById('relay-url').value.trim();
+  const peerKeyRaw = document.getElementById('peer-pubkey').value.trim();
+  const relayUrl = document.getElementById('relay-url').value.trim();
+  myName = document.getElementById('my-name').value.trim() || 'me';
 
-  myName = (document.getElementById('my-name').value || 'ME').toUpperCase();
+  if (!peerKeyRaw) {
+    toast('paste the other person\'s public key');
+    return;
+  }
+  if (!relayUrl) {
+    toast('relay URL is required');
+    return;
+  }
 
-  const peer = JSON.parse(atob(peerRaw));
+  // Parse peer key
+  let peerParsed;
+  try {
+    peerParsed = JSON.parse(atob(peerKeyRaw));
+  } catch {
+    toast('invalid public key format');
+    return;
+  }
 
-  const peerECDH = await importECDH(peer.ecdh);
-  const peerECDSA = await importECDSA(peer.ecdsa);
+  peerECDHPublicB64 = peerParsed.ecdh;
+  const peerECDSAPublicB64 = peerParsed.ecdsa;
+  const peerDeviceId = peerParsed.id;
 
-  sharedSecret = await deriveSecret(myIdentity.ecdh.privateKey, peerECDH);
+  // Derive shared secret
+  try {
+    const peerECDHKey = await importPublicKeyECDH(peerECDHPublicB64);
+    sharedSecret = await deriveSharedSecret(myIdentity.ecdhKeyPair.privateKey, peerECDHKey);
+  } catch {
+    toast('failed to derive shared secret — invalid key?');
+    return;
+  }
 
-  myIdentity.peerDeviceId = peer.id;
-  myIdentity.peerECDSAPub = peerECDSA;
+  // Store peer info
+  myIdentity.peerDeviceId = peerDeviceId;
+  myIdentity.peerECDSAPublicB64 = peerECDSAPublicB64;
 
+  // Switch to chat screen
   document.getElementById('setup-screen').style.display = 'none';
   document.getElementById('chat-screen').style.display = 'flex';
-  document.getElementById('chat-peer-id').textContent = peer.id.slice(0,8);
+  document.getElementById('chat-title').textContent = peerDeviceId.slice(0, 8) + '...';
+  document.getElementById('msg-input').focus();
 
-  connectWS(relay);
+  // Connect WebSocket
+  connectWS(relayUrl);
 }
 
-// ───────── WS ─────────
+// ─── WEBSOCKET ───────────────────────────────────────────────────────────────
 
 function connectWS(url) {
+  setStatus(false, 'connecting...');
   ws = new WebSocket(url);
 
   ws.onopen = () => {
+    // Send handshake
+    send({
+      type: 'handshake',
+      protocolVersion: '1.0',
+      senderDeviceId: myIdentity.deviceId,
+      encryptedPayload: '',
+      timestamp: Date.now()
+    });
+    setStatus(true, 'connected · encrypted');
+    systemMsg('connected to relay · messages are end-to-end encrypted');
     connected = true;
-    setStatus(true, 'CONNECTED');
-    systemMsg('SECURE CHANNEL ACTIVE');
   };
 
-  ws.onmessage = async (e) => {
-    const msg = JSON.parse(e.data);
-
-    if (msg.type !== 'chat') return;
-    if (msg.senderDeviceId === myIdentity.deviceId) return;
-
-    let payload = JSON.parse(msg.encryptedPayload);
-
-    // signature check
-    const valid = await verify(
-      myIdentity.peerECDSAPub,
-      payload.iv + '|' + payload.ct + '|' + msg.counter,
-      payload.sig
-    );
-
-    if (!valid) {
-      systemMsg('INVALID SIGNATURE — DROPPED');
-      return;
-    }
-
-    // replay protection
-    if (msg.counter <= lastSeenCounter) {
-      systemMsg('REPLAY DETECTED — DROPPED');
-      return;
-    }
-
-    lastSeenCounter = msg.counter;
-
-    const text = await decrypt(payload, sharedSecret);
-    if (text) addMessage(text, 'other', msg.timestamp);
+  ws.onmessage = async (event) => {
+    try {
+      const msg = JSON.parse(event.data.trim());
+      await handleIncoming(msg);
+    } catch {}
   };
 
   ws.onclose = () => {
+    setStatus(false, 'disconnected');
+    systemMsg('disconnected from relay');
     connected = false;
-    setStatus(false, 'DISCONNECTED');
+    // Reconnect after 3s
+    setTimeout(() => connectWS(url), 3000);
+  };
+
+  ws.onerror = () => {
+    setStatus(false, 'connection error');
   };
 }
 
-// ───────── SEND ─────────
+function send(obj) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(obj) + '\n');
+  }
+}
 
-let sendCounter = 0;
+async function handleIncoming(msg) {
+  // Handle deliver batch
+  if (msg.type === 'control' && msg.action === 'deliver') {
+    try {
+      const payload = JSON.parse(msg.encryptedPayload);
+      for (const m of (payload.messages || [])) {
+        await handleIncoming(m);
+      }
+    } catch {}
+    return;
+  }
+
+  if (msg.type !== 'chat') return;
+  if (msg.senderDeviceId === myIdentity.deviceId) return; // own message echo
+  if (msg.targetDeviceId && msg.targetDeviceId !== myIdentity.deviceId) return;
+
+  // Parse encrypted payload
+  let payload;
+  try {
+    payload = JSON.parse(msg.encryptedPayload);
+  } catch { return; }
+
+  if (!payload.iv || !payload.ct) return;
+
+  // Verify signature if present
+  if (payload.sig && myIdentity.peerECDSAPublicB64) {
+    const sigData = payload.iv + '|' + payload.ct;
+    const valid = await verifyData(myIdentity.peerECDSAPublicB64, sigData, payload.sig);
+    if (!valid) {
+      systemMsg('⚠ received message with invalid signature — dropped');
+      return;
+    }
+  }
+
+  // Decrypt
+  const plaintext = await decryptMessage(payload, sharedSecret);
+  if (plaintext === null) return;
+
+  addMessage(plaintext, 'other', msg.timestamp);
+}
+
+// ─── SEND ────────────────────────────────────────────────────────────────────
 
 async function sendMessage() {
   const input = document.getElementById('msg-input');
-  const text = input.value.trim();
-
-  if (!text || !connected) return;
+  const content = input.value.trim();
+  if (!content || !connected) return;
+  if (!sharedSecret) { toast('not connected to a peer'); return; }
 
   input.value = '';
+  autoResize(input);
 
-  const enc = await encrypt(text, sharedSecret);
+  // Encrypt
+  const encrypted = await encryptMessage(content, sharedSecret);
 
-  const sig = await sign(
-    myIdentity.ecdsa.privateKey,
-    enc.iv + '|' + enc.ct + '|' + sendCounter
-  );
+  // Sign
+  const sigData = encrypted.iv + '|' + encrypted.ct;
+  const sig = await signData(myIdentity.ecdsaKeyPair.privateKey, sigData);
+  encrypted.sig = sig;
 
-  enc.sig = sig;
+  const messageId = randomId();
+  const now = Date.now();
 
-  const msg = {
+  // Build chat envelope
+  const envelope = {
     type: 'chat',
+    protocolVersion: '1.0',
+    messageId,
     senderDeviceId: myIdentity.deviceId,
     targetDeviceId: myIdentity.peerDeviceId,
-    counter: sendCounter,
-    encryptedPayload: JSON.stringify(enc),
-    timestamp: Date.now()
+    counter: 0,
+    previousCounter: 0,
+    dhPublicKey: myIdentity.ecdhPublicB64.slice(0, 64),
+    routeTag: await makeRouteTag(myIdentity.deviceId, myIdentity.peerDeviceId, messageId),
+    encryptedPayload: JSON.stringify(encrypted),
+    timestamp: now,
+    signature: sig
   };
 
-  sendCounter++;
-
-  ws.send(JSON.stringify(msg));
-
-  addMessage(text, 'self', msg.timestamp);
+  send(envelope);
+  addMessage(content, 'self', now);
 }
 
-// ───────── UI ─────────
+async function makeRouteTag(from, to, msgId) {
+  const data = new TextEncoder().encode([from, to, msgId].sort().join(':'));
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('').repeat(2);
+}
 
-function addMessage(content, type, time) {
+// ─── UI ──────────────────────────────────────────────────────────────────────
+
+function addMessage(content, type, timestamp) {
   const area = document.getElementById('messages');
+
+  // Remove empty state if present
+  const empty = area.querySelector('.empty-state');
+  if (empty) empty.remove();
+
   const div = document.createElement('div');
+  div.className = `message ${type}`;
 
-  const t = new Date(time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const sender = type === 'self' ? myName : 'THEM';
+  const time = new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const label = type === 'self' ? myName : 'them';
 
-  div.className = 'message-line';
   div.innerHTML = `
-    <span class="msg-time">[${t}]</span>
-    <span class="msg-sender ${type}">&lt;${sender}&gt;</span>
-    <span class="msg-content">${escapeHtml(content)}</span>
+    <div class="message-bubble">${escapeHtml(content)}</div>
+    <div class="message-meta">${label} · ${time}</div>
   `;
 
   area.appendChild(div);
@@ -375,17 +853,16 @@ function addMessage(content, type, time) {
 function systemMsg(text) {
   const area = document.getElementById('messages');
   const div = document.createElement('div');
-  div.className = 'system-line';
+  div.className = 'system-msg';
   div.textContent = text;
   area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
 }
 
-function setStatus(on, text) {
-  const led = document.getElementById('status-led');
-  const t = document.getElementById('status-text');
-
-  led.className = 'status-led' + (on ? ' online' : '');
-  t.textContent = text;
+function setStatus(online, subtitle) {
+  const dot = document.getElementById('status-dot');
+  dot.className = 'status-dot' + (online ? '' : ' offline');
+  document.getElementById('chat-subtitle').textContent = subtitle;
 }
 
 function handleKey(e) {
@@ -397,15 +874,11 @@ function handleKey(e) {
 
 function autoResize(el) {
   el.style.height = 'auto';
-  el.style.height = el.scrollHeight + 'px';
-}
-
-function escapeHtml(str) {
-  return str.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
 }
 
 function copyMyKey() {
-  navigator.clipboard.writeText(myIdentity.fullPublicKey);
+  navigator.clipboard.writeText(myIdentity.fullPublicKey).then(() => toast('public key copied!'));
 }
 
 function showMyKey() {
@@ -418,11 +891,19 @@ function closeModal(e) {
   }
 }
 
-// ───────── START ─────────
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
 
-runBoot();
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+}
+
+// ─── START ───────────────────────────────────────────────────────────────────
 init();
-
 </script>
 </body>
 </html>
